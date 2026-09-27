@@ -2,12 +2,10 @@ name: Build Kavir Browser APK
 
 on:
   push:
-    branches: [ "main" ]
-    paths-ignore:
-      - 'apk/**'
-      - 'README.md'
+    branches: ["main"]
+    paths-ignore: ["apk/**","README.md"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -15,27 +13,59 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v5
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: stable
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r29
+          add-to-path: true
+
+      - name: Build libXray Android AAR
+        shell: bash
+        run: |
+          set -e
+          rm -rf /tmp/libXray
+          git clone --depth 1 https://github.com/XTLS/libXray.git /tmp/libXray
+          cd /tmp/libXray
+          go mod download
+          python3 build/main.py android
+          test -f libXray.aar
+          mkdir -p "$GITHUB_WORKSPACE/app/libs"
+          cp libXray.aar "$GITHUB_WORKSPACE/app/libs/libXray.aar"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: '8.2.1'
+          gradle-version: "8.2.1"
 
       - name: Build Debug APK
         run: gradle assembleDebug --stacktrace
 
-      - name: Prepare APK Output
+      - name: Prepare APK
         run: |
           mkdir -p apk
           cp app/build/outputs/apk/debug/app-debug.apk apk/KavirBrowser-debug.apk
@@ -51,22 +81,17 @@ jobs:
         if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
-        shell: bash
         run: |
           TAG="build-${{ github.run_number }}"
-          gh release create "$TAG" apk/KavirBrowser-debug.apk \
-            --title "Kavir Browser Build ${{ github.run_number }}" \
-            --notes "Automatic APK build from commit ${{ github.sha }}." \
-            --latest=false
+          gh release create "$TAG" apk/KavirBrowser-debug.apk             --title "Kavir Browser Build ${{ github.run_number }}"             --notes "Kavir Browser with locally bundled libXray/Xray core."             --latest=false
 
       - name: Commit APK to Repository
         if: github.event_name == 'push'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add apk/KavirBrowser-debug.apk
-          git status
           git diff-index --quiet HEAD || git commit -m "build: update KavirBrowser-debug.apk [skip ci]"
-          git push origin ${{ github.ref_name }}
+          git push origin "${{ github.ref_name }}"
