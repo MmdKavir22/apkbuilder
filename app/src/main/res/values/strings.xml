@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Kavir Work</string>
-    <string name="history_title">تاریخچه کارها</string>
-    <string name="start_work">شروع کار</string>
-    <string name="finish_work">پایان کار</string>
-    <string name="status_idle">آماده برای شروع کار</string>
-    <string name="status_active_prefix">در حال کار — شروع: %1$s</string>
-    <string name="tasks_title">لیست کارها</string>
-    <string name="add_task">افزودن کار</string>
-    <string name="history_button">تاریخچه</string>
-    <string name="add_task_hint">نام کار جدید را وارد کنید</string>
-    <string name="dialog_add">افزودن</string>
-    <string name="dialog_cancel">انصراف</string>
-    <string name="delete_task">حذف</string>
-    <string name="no_history">هنوز جلسه کاری ثبت نشده است</string>
-    <string name="no_tasks_completed">کاری تکمیل نشد</string>
-    <string name="session_date">تاریخ: %1$s</string>
-    <string name="session_time">%1$s  تا  %2$s</string>
-    <string name="completed_tasks_label">کارهای انجام‌شده:</string>
+    <string name="app_name">Kavir Browser</string>
+    <string name="url_placeholder">جستجو یا وارد کردن آدرس وب...</string>
+    <string name="settings">تنظیمات</string>
+    <string name="proxy_settings">تنظیمات پروکسی Cloudflare</string>
+    <string name="proxy_mode">حالت پروکسی</string>
+    <string name="direct_mode">مستقیم (اصلی)</string>
+    <string name="worker_mode">ورکر کلادفلر</string>
+    <string name="worker_url">آدرس Worker</string>
+    <string name="secret_token">توکن امنیتی (اختیاری)</string>
+    <string name="save">ذخیره</string>
+    <string name="test_connection">تست اتصال</string>
+    <string name="proxy_active_status">وضعیت: %s</string>
+    <string name="clear_history">پاک‌سازی تاریخچه</string>
+    <string name="clear_cookies">پاک‌سازی کوکی‌ها</string>
+    <string name="about">درباره مرورگر کویر</string>
 </resources>
