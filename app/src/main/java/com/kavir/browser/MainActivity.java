@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String guessName(String u,String cd){
-        if(cd!=null&&cd.contains("filename=")){String n=cd.substring(cd.indexOf("filename=")+9).replace(""","").trim();if(!n.isEmpty())return n;}
+        if(cd!=null&&cd.contains("filename=")){String n=cd.substring(cd.indexOf("filename=")+9).replace("\\\"","").trim();if(!n.isEmpty())return n;}
         try{String p=Uri.parse(u).getLastPathSegment();if(p!=null&&!p.isEmpty())return p;}catch(Exception ignored){}
         return "kavir-download";
     }
