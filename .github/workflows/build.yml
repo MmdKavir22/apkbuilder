@@ -2,9 +2,12 @@ name: Build Kavir Browser APK
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
     paths-ignore:
-      - "apk/**"
+      - 'apk/**'
+      - 'README.md'
+  pull_request:
+    branches: [ "main" ]
   workflow_dispatch:
 
 permissions:
@@ -13,37 +16,27 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
-      ANDROID_HOME: /usr/local/lib/android/sdk
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v4
         with:
-          distribution: temurin
-          java-version: "17"
+          distribution: 'temurin'
+          java-version: '17'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6
-        with:
-          gradle-version: "8.2.2"
+        uses: gradle/actions/setup-gradle@v3
 
-      - name: Install Android SDK packages
-        shell: bash
-        run: |
-          SDKMANAGER="$(find "$ANDROID_SDK_ROOT/cmdline-tools" -type f -name sdkmanager -print -quit)"
-          test -n "$SDKMANAGER"
-          yes | "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null || true
-          "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT"             "platform-tools"             "platforms;android-34"             "build-tools;34.0.0"
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew || true
 
       - name: Build Debug APK
-        run: gradle assembleDebug --stacktrace
+        run: ./gradlew assembleDebug --stacktrace
 
-      - name: Prepare APK
+      - name: Prepare APK Output
         run: |
           mkdir -p apk
           cp app/build/outputs/apk/debug/app-debug.apk apk/KavirBrowser-debug.apk
@@ -56,21 +49,25 @@ jobs:
           if-no-files-found: error
 
       - name: Create GitHub Release
+        if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
           TAG="build-${{ github.run_number }}"
-          gh release create "$TAG" apk/KavirBrowser-debug.apk             --title "Kavir Browser Build ${{ github.run_number }}"             --notes "Automatic APK build from commit ${{ github.sha }}."             --latest=false
+          gh release create "$TAG" apk/KavirBrowser-debug.apk \
+            --title "Kavir Browser Build ${{ github.run_number }}" \
+            --notes "Automatic APK build from commit ${{ github.sha }}." \
+            --latest=false
 
-      - name: Commit APK to repository
-        if: github.event_name == "push"
+      - name: Commit APK to Repository
+        if: github.event_name == 'push'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add apk/KavirBrowser-debug.apk
-          if git diff --cached --quiet; then
-            echo "APK has not changed."
-          else
-            git commit -m "build: update Kavir Browser APK [skip ci]"
-            git push origin HEAD:${{ github.ref_name }}
-          fi
+          git status
+          git diff-index --quiet HEAD || git commit -m "build: update KavirBrowser-debug.apk [skip ci]"
+          git push origin ${{ github.ref_name }}
