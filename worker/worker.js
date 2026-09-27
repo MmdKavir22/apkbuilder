@@ -1,52 +1,69 @@
-/**
- * Kavir Browser - Cloudflare Worker Proxy
- *
- * Optional protection:
- * Cloudflare Dashboard -> Worker -> Settings -> Variables and Secrets
- * Add a secret named SECRET_TOKEN.
- */
+/** Kavir Browser - Advanced Cloudflare Worker Proxy */
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS",
+  "Access-Control-Allow-Headers": "*",
+  "Access-Control-Expose-Headers": "Accept-Ranges,Content-Length,Content-Range,Content-Type,Location,ETag,Last-Modified",
+  "Access-Control-Max-Age": "86400"
+};
+
+function proxyUrl(workerUrl, target) {
+  const u = new URL(workerUrl);
+  u.search = "";
+  u.searchParams.set("url", target.toString());
+  return u.toString();
+}
+
 export default {
   async fetch(request, env) {
-    const requestUrl = new URL(request.url);
-    const targetUrl = requestUrl.searchParams.get("url");
+    const incoming = new URL(request.url);
 
-    const configuredToken = env.SECRET_TOKEN;
-    if (configuredToken) {
-      const suppliedToken = request.headers.get("X-Kavir-Token");
-      if (suppliedToken !== configuredToken) {
-        return new Response("Unauthorized Access to Kavir Proxy", { status: 403 });
-      }
+    if (request.method === "OPTIONS") {
+      return new Response(null, { status: 204, headers: corsHeaders });
     }
 
-    if (!targetUrl) {
-      return new Response(
-        "Kavir Proxy is active. Use ?url=https://example.com",
-        {
-          status: 200,
-          headers: { "Content-Type": "text/plain; charset=utf-8" }
-        }
-      );
+    const targetParam = incoming.searchParams.get("url");
+    if (!targetParam) {
+      return new Response("<h1>Kavir Browser Proxy</h1><p>Worker is online.</p>", {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" }
+      });
+    }
+
+    if (env.SECRET_TOKEN && request.headers.get("X-Kavir-Token") !== env.SECRET_TOKEN) {
+      return new Response("Forbidden", { status: 403, headers: corsHeaders });
     }
 
     let target;
     try {
-      target = new URL(targetUrl);
+      target = new URL(targetParam);
     } catch {
-      return new Response("Invalid target URL", { status: 400 });
+      return new Response("Invalid target URL", { status: 400, headers: corsHeaders });
     }
 
-    if (target.protocol !== "https:" && target.protocol !== "http:") {
-      return new Response("Only HTTP and HTTPS targets are supported", { status: 400 });
+    if (target.protocol !== "http:" && target.protocol !== "https:") {
+      return new Response("Only HTTP/HTTPS targets are supported", {
+        status: 400, headers: corsHeaders
+      });
     }
 
-    const headers = new Headers(request.headers);
-    headers.delete("Host");
-    headers.delete("X-Kavir-Token");
+    const headers = new Headers();
+    for (const [key, value] of request.headers) {
+      const lower = key.toLowerCase();
+      if (lower === "host" || lower === "x-kavir-token" || lower === "content-length" || lower === "connection") continue;
+      headers.set(key, value);
+    }
+
+    headers.set(
+      "User-Agent",
+      request.headers.get("User-Agent") ||
+      "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36"
+    );
 
     const init = {
       method: request.method,
       headers,
-      redirect: "follow"
+      redirect: "manual"
     };
 
     if (request.method !== "GET" && request.method !== "HEAD") {
@@ -54,21 +71,28 @@ export default {
     }
 
     try {
-      const response = await fetch(target.toString(), init);
-      const responseHeaders = new Headers(response.headers);
+      const upstream = await fetch(target.toString(), init);
+      const responseHeaders = new Headers(upstream.headers);
 
-      responseHeaders.set("Access-Control-Allow-Origin", "*");
-      responseHeaders.set("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
-      responseHeaders.set("Access-Control-Allow-Headers", "*");
+      for (const [key, value] of Object.entries(corsHeaders)) responseHeaders.set(key, value);
+      responseHeaders.delete("content-security-policy");
+      responseHeaders.delete("content-security-policy-report-only");
+      responseHeaders.delete("x-frame-options");
 
-      return new Response(response.body, {
-        status: response.status,
-        statusText: response.statusText,
+      if (upstream.status >= 300 && upstream.status < 400) {
+        const location = upstream.headers.get("Location");
+        if (location) responseHeaders.set("Location", proxyUrl(request.url, new URL(location, target)));
+      }
+
+      return new Response(upstream.body, {
+        status: upstream.status,
+        statusText: upstream.statusText,
         headers: responseHeaders
       });
     } catch (error) {
-      return new Response("Proxy error: " + (error?.message || "unknown error"), {
-        status: 502
+      return new Response("Proxy error: " + (error?.message || "unknown"), {
+        status: 502,
+        headers: { ...corsHeaders, "Content-Type": "text/plain; charset=utf-8" }
       });
     }
   }
