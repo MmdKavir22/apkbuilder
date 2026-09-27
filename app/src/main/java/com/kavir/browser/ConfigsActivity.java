@@ -7,6 +7,7 @@ import android.view.Gravity;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import com.kavir.browser.db.DatabaseHelper;
+import com.kavir.browser.proxy.XrayCoreManager;
 import java.util.List;
 
 public class ConfigsActivity extends AppCompatActivity {
