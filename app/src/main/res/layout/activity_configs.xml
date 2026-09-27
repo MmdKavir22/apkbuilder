@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/bg_dark">
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/manage_configs" android:textColor="@color/text_light" android:textSize="24sp" android:textStyle="bold"/>
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="VMess یا Xray JSON خودت را اضافه و مدیریت کن" android:textColor="@color/text_muted"/>
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp">
+<Button android:id="@+id/btnAddVmess" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/import_vmess"/>
+<Button android:id="@+id/btnAddJson" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="8dp" android:text="@string/import_json"/>
+</LinearLayout>
+<LinearLayout android:id="@+id/configList" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="18dp"/>
+</LinearLayout></ScrollView>
