@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Kavir Work"
+rootProject.name = "KavirBrowser"
 include ':app'
