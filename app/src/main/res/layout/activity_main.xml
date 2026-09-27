@@ -24,13 +24,14 @@
         <EditText
             android:id="@+id/etUrlBar"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="42dp"
             android:layout_weight="1"
-            android:layout_marginHorizontal="8dp"
+            android:layout_marginHorizontal="6dp"
             android:background="@drawable/card_border"
             android:hint="@string/url_placeholder"
             android:textColorHint="@color/text_muted"
             android:textColor="@color/text_light"
+            android:singleLine="true"
             android:paddingHorizontal="12dp"
             android:imeOptions="actionGo"
             android:inputType="textUri"
@@ -61,51 +62,63 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="52dp"
         android:orientation="horizontal"
         android:background="@color/card_dark"
-        android:gravity="center">
+        android:gravity="center_vertical"
+        android:paddingHorizontal="4dp">
 
         <ImageButton
             android:id="@+id/btnBack"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0.9"
             android:background="?selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_media_previous" />
+            android:src="@android:drawable/ic_media_previous"
+            android:contentDescription="Back" />
 
         <ImageButton
             android:id="@+id/btnForward"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0.9"
             android:background="?selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_media_next" />
+            android:src="@android:drawable/ic_media_next"
+            android:contentDescription="Forward" />
 
         <TextView
             android:id="@+id/tvProxyIndicator"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:layout_weight="1.7"
+            android:layout_marginHorizontal="4dp"
+            android:background="@drawable/card_border"
             android:text="DIRECT"
             android:textColor="@color/status_direct"
             android:textStyle="bold"
-            android:gravity="center" />
+            android:gravity="center"
+            android:textSize="12sp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="اتصال VPN / Xray" />
 
         <ImageButton
             android:id="@+id/btnRefresh"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="0.9"
             android:background="?selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_rotate" />
+            android:src="@android:drawable/ic_menu_rotate"
+            android:contentDescription="Refresh" />
 
         <Button
             android:id="@+id/btnTabs"
             android:layout_width="0dp"
-            android:layout_height="36dp"
-            android:layout_weight="1"
+            android:layout_height="38dp"
+            android:layout_weight="0.9"
             android:text="1"
+            android:minWidth="0dp"
+            android:paddingHorizontal="0dp"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
     </LinearLayout>
 </LinearLayout>
