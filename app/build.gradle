@@ -3,20 +3,20 @@ plugins {
 }
 
 android {
-    namespace 'com.kavir.worktracker'
+    namespace 'com.kavir.browser'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.kavir.worktracker"
-        minSdk 24
-        targetSdk 33
+        applicationId "com.kavir.browser"
+        minSdk 33
+        targetSdk 34
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -31,6 +31,5 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.recyclerview:recyclerview:1.3.2'
-    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 }
