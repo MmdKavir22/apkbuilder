@@ -1,52 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@color/bg_dark">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/proxy_settings"
-        android:textColor="@color/text_light"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp"/>
-
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/switchProxy"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/proxy_mode"
-        android:textColor="@color/text_light"
-        android:textSize="16sp"/>
-
-    <EditText
-        android:id="@+id/etWorkerUrl"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:hint="https://your-worker.example.workers.dev"
-        android:textColorHint="@color/text_muted"
-        android:textColor="@color/text_light"
-        android:inputType="textUri"/>
-
-    <EditText
-        android:id="@+id/etSecretToken"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="@string/secret_token"
-        android:textColorHint="@color/text_muted"
-        android:textColor="@color/text_light"
-        android:inputType="textPassword"/>
-
-    <Button
-        android:id="@+id/btnSaveProxy"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/save"/>
-</LinearLayout>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/bg_dark">
+<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="18dp">
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/proxy_settings" android:textColor="@color/text_light" android:textSize="24sp" android:textStyle="bold"/>
+<TextView android:id="@+id/tvStatus" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="قطع شده" android:textColor="@color/status_disconnected" android:textSize="16sp"/>
+<TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="کانفیگ فعال" android:textColor="@color/text_muted"/>
+<TextView android:id="@+id/tvActiveConfigTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:padding="14dp" android:background="@drawable/bg_card_rounded" android:textColor="@color/text_light" android:textSize="16sp"/>
+<Button android:id="@+id/btnToggleConnection" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:text="@string/connect"/>
+<Button android:id="@+id/btnManageConfigs" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/manage_configs"/>
+</LinearLayout></ScrollView>
