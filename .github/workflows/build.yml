@@ -1,9 +1,8 @@
-name: Build APK
+name: Build Kavir Browser APK
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main", "master" ]
     paths-ignore:
       - "apk/**"
   workflow_dispatch:
@@ -14,7 +13,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     env:
       ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
       ANDROID_HOME: /usr/local/lib/android/sdk
@@ -27,68 +25,52 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
         with:
-          gradle-version: '8.2.1'
+          gradle-version: "8.2.2"
 
       - name: Install Android SDK packages
         shell: bash
         run: |
           SDKMANAGER="$(find "$ANDROID_SDK_ROOT/cmdline-tools" -type f -name sdkmanager -print -quit)"
-          if [ -z "$SDKMANAGER" ]; then
-            echo "sdkmanager was not found in $ANDROID_SDK_ROOT/cmdline-tools"
-            find "$ANDROID_SDK_ROOT/cmdline-tools" -maxdepth 3 -type f 2>/dev/null || true
-            exit 1
-          fi
-
-          echo "Using sdkmanager: $SDKMANAGER"
-
+          test -n "$SDKMANAGER"
           yes | "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" --licenses >/dev/null || true
-
-          "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT" \
-            "platform-tools" \
-            "platforms;android-34" \
-            "build-tools;34.0.0"
+          "$SDKMANAGER" --sdk_root="$ANDROID_SDK_ROOT"             "platform-tools"             "platforms;android-34"             "build-tools;34.0.0"
 
       - name: Build Debug APK
         run: gradle assembleDebug --stacktrace
 
+      - name: Prepare APK
+        run: |
+          mkdir -p apk
+          cp app/build/outputs/apk/debug/app-debug.apk apk/KavirBrowser-debug.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: KavirBrowser-debug
+          path: apk/KavirBrowser-debug.apk
+          if-no-files-found: error
+
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-        shell: bash
         run: |
           TAG="build-${{ github.run_number }}"
-          gh release create "$TAG" \
-            app/build/outputs/apk/debug/app-debug.apk \
-            --title "KavirWork Build ${{ github.run_number }}" \
-            --notes "Automatic APK build from commit ${{ github.sha }}." \
-            --latest=false
+          gh release create "$TAG" apk/KavirBrowser-debug.apk             --title "Kavir Browser Build ${{ github.run_number }}"             --notes "Automatic APK build from commit ${{ github.sha }}."             --latest=false
 
-      - name: Put APK in repository
-        shell: bash
+      - name: Commit APK to repository
+        if: github.event_name == "push"
         run: |
-          mkdir -p apk
-          cp app/build/outputs/apk/debug/app-debug.apk apk/KavirWork-debug.apk
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add apk/KavirWork-debug.apk
-
+          git add apk/KavirBrowser-debug.apk
           if git diff --cached --quiet; then
             echo "APK has not changed."
           else
-            git commit -m "Update KavirWork APK"
-            git push origin HEAD:main
+            git commit -m "build: update Kavir Browser APK [skip ci]"
+            git push origin HEAD:${{ github.ref_name }}
           fi
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: KavirWork-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
