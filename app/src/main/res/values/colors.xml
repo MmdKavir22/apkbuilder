@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Kavir Browser palette -->
     <color name="bg_dark">#121212</color>
     <color name="card_dark">#1E1E1E</color>
     <color name="primary_accent">#00ADB5</color>
@@ -9,4 +10,11 @@
     <color name="status_direct">#4CAF50</color>
     <color name="status_proxy">#FF9800</color>
     <color name="border_dark">#2C2C2C</color>
+
+    <!-- Compatibility colors used by the legacy work theme -->
+    <color name="purple_primary">#7C4DFF</color>
+    <color name="purple_dark">#512DA8</color>
+    <color name="background_dark">#121212</color>
+    <color name="text_primary">#EEEEEE</color>
+    <color name="text_secondary">#B0B0B0</color>
 </resources>
