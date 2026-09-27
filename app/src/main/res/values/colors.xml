@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="background_dark">#121016</color>
-    <color name="surface_dark">#1E1B24</color>
-    <color name="surface_light">#2A2632</color>
-    <color name="purple_primary">#9D6CFF</color>
-    <color name="purple_dark">#6D3FD6</color>
-    <color name="green_success">#4CD97B</color>
-    <color name="red_destructive">#FF5C5C</color>
-    <color name="text_primary">#FFFFFF</color>
-    <color name="text_secondary">#A8A2B5</color>
-    <color name="text_muted">#726C7D</color>
+    <color name="bg_dark">#121212</color>
+    <color name="card_dark">#1E1E1E</color>
+    <color name="primary_accent">#00ADB5</color>
+    <color name="primary_accent_hover">#00FFF5</color>
+    <color name="text_light">#EEEEEE</color>
+    <color name="text_muted">#B0B0B0</color>
+    <color name="status_direct">#4CAF50</color>
+    <color name="status_proxy">#FF9800</color>
+    <color name="border_dark">#2C2C2C</color>
 </resources>
