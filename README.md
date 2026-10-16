@@ -1,62 +1,34 @@
-# Kavir Browser
+# Kavir Android Apps
 
-مرورگر اندرویدی Kavir Browser با رابط تاریک و حالت اختیاری Cloudflare Worker Proxy.
+This repository builds two separate Android apps with GitHub Actions.
 
-## امکانات
+## 1. Kavir Browser
+The existing dark Android browser, including WebView browsing, tabs, history, bookmarks, and optional Xray/Worker proxy features.
 
-- رابط مدرن و تاریک
-- WebView با JavaScript و DOM Storage
-- نوار آدرس و جستجو
-- Back / Forward / Refresh / Home
-- تب‌های پایه
-- ذخیره تاریخچه در SQLite
-- تنظیمات Worker Proxy
-- پشتیبانی RTL و فارسی
-- ساخت APK با GitHub Actions
-- قرار گرفتن APK در GitHub Releases بعد از هر Build
+## 2. Kavir Telegram Bot Manager
+A separate local Android app for managing a Telegram bot using the official Telegram Bot API.
 
-## Cloudflare Worker
+Features:
+- Validate a bot token with `getMe` and show bot name, username, and ID.
+- Encrypt the token locally with AES/GCM backed by Android Keystore.
+- Send messages to a chat or channel.
+- Edit or delete a message when Telegram permissions and API rules allow it.
+- Read currently available updates and show sender/chat identifiers.
+- Inspect webhook status with `getWebhookInfo`.
 
-کد Worker در فایل `worker/worker.js` قرار دارد.
+Important limitations:
+- Bot API does not expose a complete archive of old chats/messages.
+- The app fetches updates manually; it does not run a persistent background polling service.
+- `getUpdates` cannot be used while a webhook is active.
+- Do not share your bot token or commit it to GitHub. Revoke a leaked token through BotFather.
+- Message editing/deletion depends on Telegram's permissions and restrictions.
 
-در Cloudflare:
+## Build and download APKs
 
-1. وارد Workers & Pages شوید.
-2. یک Worker بسازید.
-3. محتوای `worker/worker.js` را در ادیتور Worker قرار دهید.
-4. Deploy کنید.
-5. آدرس `workers.dev` را کپی کنید.
-6. در Kavir Browser به Settings → Proxy Settings بروید.
-7. حالت Worker را فعال و URL را وارد کنید.
+The GitHub Actions workflow builds both apps. The APKs are uploaded as a workflow artifact and, on pushes to `main`, attached to a GitHub Release.
 
-برای امنیت بیشتر می‌توانید یک Secret با نام `SECRET_TOKEN` در Cloudflare بسازید و همان مقدار را داخل برنامه وارد کنید.
+Expected APK names:
+- `KavirBrowser-debug.apk`
+- `KavirBotManager-debug.apk`
 
-> این Worker یک HTTP gateway است و VPN کامل یا VPN سراسری دستگاه نیست. بعضی سایت‌ها، WebSocketها، DRM، استریم‌ها و درخواست‌های خاص ممکن است از طریق یک proxy عمومی به‌طور کامل کار نکنند.
-
-## Build
-
-Workflow گیت‌هاب با Java 17 و Android SDK 34 پروژه را Build می‌کند.
-
-با هر اجرای موفق، فایل APK علاوه بر Artifact در بخش **Releases** نیز منتشر می‌شود:
-
-`Kavir Browser Build <run number>`
-
-فایل APK داخل Release با نام:
-
-`KavirBrowser-debug.apk`
-
-قرار می‌گیرد.
-
-## ساخت محلی
-
-در محیطی که Gradle نصب است:
-
-```bash
-gradle assembleDebug
-```
-
-APK در:
-
-`app/build/outputs/apk/debug/app-debug.apk`
-
-ساخته می‌شود.
+The source code for the Telegram app is in `botmanager/`; the existing browser remains in `app/`.

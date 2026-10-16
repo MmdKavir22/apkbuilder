@@ -1,9 +1,9 @@
-name: Build Kavir Browser APK
+name: Build Kavir APKs
 
 on:
   push:
     branches: ["main"]
-    paths-ignore: ["apk/**","README.md"]
+    paths-ignore: ["apk/**", "README.md"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:
@@ -69,19 +69,21 @@ jobs:
         with:
           gradle-version: "8.2.1"
 
-      - name: Build Debug APK
-        run: gradle assembleDebug --stacktrace
+      - name: Build both Debug APKs
+        run: gradle :app:assembleDebug :botmanager:assembleDebug --stacktrace
 
-      - name: Prepare APK
+      - name: Prepare APKs
         run: |
           mkdir -p apk
           cp app/build/outputs/apk/debug/app-debug.apk apk/KavirBrowser-debug.apk
+          cp botmanager/build/outputs/apk/debug/botmanager-debug.apk apk/KavirBotManager-debug.apk
+          ls -lh apk/*.apk
 
-      - name: Upload APK Artifact
+      - name: Upload APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: KavirBrowser-debug
-          path: apk/KavirBrowser-debug.apk
+          name: Kavir-Android-APKs
+          path: apk/*.apk
           if-no-files-found: error
 
       - name: Create GitHub Release
@@ -90,15 +92,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="build-${{ github.run_number }}"
-          gh release create "$TAG" apk/KavirBrowser-debug.apk             --title "Kavir Browser Build ${{ github.run_number }}"             --notes "Kavir Browser with locally bundled libXray/Xray core."             --latest=false
+          gh release create "$TAG" apk/KavirBrowser-debug.apk apk/KavirBotManager-debug.apk             --title "Kavir Android Apps Build ${{ github.run_number }}"             --notes "Debug APKs: Kavir Browser and Kavir Telegram Bot Manager."             --latest=false
 
-      - name: Commit APK to Repository
+      - name: Commit APKs to Repository
         if: github.event_name == 'push'
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apk/KavirBrowser-debug.apk
-          git diff-index --quiet HEAD || git commit -m "build: update KavirBrowser-debug.apk [skip ci]"
+          git add apk/KavirBrowser-debug.apk apk/KavirBotManager-debug.apk
+          git diff-index --quiet HEAD || git commit -m "build: update Android APKs [skip ci]"
           git push origin "${{ github.ref_name }}"
