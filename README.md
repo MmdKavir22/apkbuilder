@@ -1,34 +1,26 @@
-# Kavir Android Apps
+# Kavir Telegram Bot Manager
 
-This repository builds two separate Android apps with GitHub Actions.
+This repository's Android build now produces only **Kavir Telegram Bot Manager**. The old browser module is no longer included in Gradle builds.
 
-## 1. Kavir Browser
-The existing dark Android browser, including WebView browsing, tabs, history, bookmarks, and optional Xray/Worker proxy features.
+## What the app can do
+- Connect a bot token from BotFather using `getMe`.
+- Encrypt and store the token locally using Android Keystore.
+- Send messages to a known chat ID or channel username.
+- Edit or delete messages where Telegram permissions and Bot API rules allow it.
+- Fetch available incoming updates manually and show sender/chat IDs.
+- Check webhook status.
 
-## 2. Kavir Telegram Bot Manager
-A separate local Android app for managing a Telegram bot using the official Telegram Bot API.
+## Important Telegram Bot API limitation
+This is a bot-management app, not a Telegram user-account client. A bot token cannot sign into Telegram as a human account and cannot reveal all of that account's private chats, groups, channels, or historical messages.
 
-Features:
-- Validate a bot token with `getMe` and show bot name, username, and ID.
-- Encrypt the token locally with AES/GCM backed by Android Keystore.
-- Send messages to a chat or channel.
-- Edit or delete a message when Telegram permissions and API rules allow it.
-- Read currently available updates and show sender/chat identifiers.
-- Inspect webhook status with `getWebhookInfo`.
+The bot can receive messages from private users who have started it, and messages/updates from groups or channels where it has been added and has the relevant access. Bot API does not provide a general API to enumerate every chat the bot has ever interacted with or fetch a complete chat history. The app's inbox therefore shows only updates that Telegram makes available to the bot.
 
-Important limitations:
-- Bot API does not expose a complete archive of old chats/messages.
-- The app fetches updates manually; it does not run a persistent background polling service.
+- Updates are fetched manually in this version; continuous background polling is not enabled.
 - `getUpdates` cannot be used while a webhook is active.
-- Do not share your bot token or commit it to GitHub. Revoke a leaked token through BotFather.
-- Message editing/deletion depends on Telegram's permissions and restrictions.
+- Do not share the token or commit it to GitHub. If exposed, revoke it through BotFather.
+- Editing/deleting messages depends on Telegram's permissions and API restrictions.
 
-## Build and download APKs
+## Build and download
+GitHub Actions builds `KavirTelegramManager-debug.apk`. Download it from the successful workflow run's **Artifacts** section or from the matching GitHub Release.
 
-The GitHub Actions workflow builds both apps. The APKs are uploaded as a workflow artifact and, on pushes to `main`, attached to a GitHub Release.
-
-Expected APK names:
-- `KavirBrowser-debug.apk`
-- `KavirBotManager-debug.apk`
-
-The source code for the Telegram app is in `botmanager/`; the existing browser remains in `app/`.
+Source code is in `botmanager/`.
